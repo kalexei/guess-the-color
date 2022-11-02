@@ -1,34 +1,118 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import './App.css'
+import { useEffect, useState } from "react";
+import "./App.css";
+import ColorBox from "./components/ColorBox";
+
+function compare(x, y) {
+  return x === y;
+}
+
+const status = {
+  win: "WIN",
+  loss: "LOSS",
+  pending: "PENDING",
+};
+
+function createRandomColor() {
+  return `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+}
+
+function generateRandomColors(amount) {
+  const colors = [];
+  for (let i = 0; i < amount; i++) {
+    colors.push(createRandomColor());
+  }
+  return colors;
+}
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [currentAmount, setCurrentAmount] = useState(3);
+  const [currentColors, setCurrentColors] = useState(
+    generateRandomColors(currentAmount)
+  );
+  const [currentStatus, setCurrentStatus] = useState(status.pending);
+  const [correctColor, setCorrectColor] = useState();
+  const [inputAmount, setInputAmount] = useState(3);
+
+  useEffect(() => {
+    if (currentStatus === status.pending) {
+      setCurrentColors(generateRandomColors(currentAmount));
+    }
+  }, [currentStatus, currentAmount]);
+
+  useEffect(() => {
+    setCorrectColor(
+      currentColors[Math.floor(Math.random() * currentColors.length)]
+    );
+  }, [currentColors]);
 
   return (
     <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <input
+        type="number"
+        value={inputAmount}
+        onChange={e => {
+          if (e.target.value < 3 || e.target.value > 9) {
+            return;
+          }
+          setInputAmount(e.target.value);
+        }}
+      />
+      <button
+        onClick={() => {
+          setCurrentAmount(inputAmount);
+        }}
+      >
+        Apply
+      </button>
+      <div className="colorBoxContainer">
+        <ColorBox color={correctColor} />
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
+      <div className="buttonsContainer">
+        {currentColors?.map((color, i) => (
+          <button
+            disabled={currentStatus !== status.pending}
+            key={i}
+            onClick={() => {
+              setCurrentStatus(
+                compare(color, correctColor) ? status.win : status.loss
+              );
+            }}
+            className={
+              currentStatus !== status.pending && compare(color, correctColor)
+                ? "greenButton"
+                : currentStatus !== status.pending &&
+                  !compare(color, correctColor)
+                ? "redButton"
+                : ""
+            }
+          >
+            {color}
+          </button>
+        ))}
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <div className={"nextButton"}>
+        {currentStatus === status.loss ? (
+          <button
+            onClick={() => {
+              setCurrentStatus(status.pending);
+            }}
+          >
+            Try again
+          </button>
+        ) : null}
+        {currentStatus === status.win ? (
+          <button
+            className="winButton"
+            onClick={() => {
+              setCurrentStatus(status.pending);
+            }}
+          >
+            Next
+          </button>
+        ) : null}
+      </div>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
