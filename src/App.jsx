@@ -47,23 +47,25 @@ function App() {
 
   return (
     <div className="App">
-      <input
-        type="number"
-        value={inputAmount}
-        onChange={e => {
-          if (e.target.value < 3 || e.target.value > 9) {
-            return;
-          }
-          setInputAmount(e.target.value);
-        }}
-      />
-      <button
-        onClick={() => {
-          setCurrentAmount(inputAmount);
-        }}
-      >
-        Apply
-      </button>
+      <div className="settings">
+        <input
+          type="number"
+          value={inputAmount}
+          onChange={e => {
+            if (e.target.value < 3 || e.target.value > 9) {
+              return;
+            }
+            setInputAmount(e.target.value);
+          }}
+        />
+        <button
+          onClick={() => {
+            setCurrentAmount(inputAmount);
+          }}
+        >
+          Apply
+        </button>
+      </div>
       <div className="colorBoxContainer">
         <ColorBox color={correctColor} />
       </div>
